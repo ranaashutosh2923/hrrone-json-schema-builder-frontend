@@ -1,56 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Layout, Row, Col, Button, Card, Typography } from 'antd';
 import { PlusOutlined, CodeOutlined } from '@ant-design/icons';
 import SchemaField from './components/SchemaField';
 import JsonPreview from './components/JsonPreview';
-import { SchemaField as SchemaFieldType } from './types/schema';
+import { useSchema } from './context/SchemaContext';
 import './App.css';
 
 const { Content, Header } = Layout;
 const { Title } = Typography;
 
 function App() {
-  const [fields, setFields] = useState<SchemaFieldType[]>([
-    {
-      id: 'field_1',
-      name: 'hno',
-      type: 'number',
-      required: false
-    },
-    {
-      id: 'field_2',
-      name: 'city',
-      type: 'string',
-      required: false
-    },
-    {
-      id: 'field_3',
-      name: 'pin',
-      type: 'number',
-      required: false
-    }
-  ]);
-
-  const addField = () => {
-    const newField: SchemaFieldType = {
-      id: `field_${Date.now()}`,
-      name: `field${fields.length + 1}`,
-      type: 'string',
-      required: false
-    };
-    setFields([...fields, newField]);
-  };
-
-  const updateField = (index: number, updatedField: SchemaFieldType) => {
-    const newFields = [...fields];
-    newFields[index] = updatedField;
-    setFields(newFields);
-  };
-
-  const deleteField = (index: number) => {
-    const newFields = fields.filter((_, i) => i !== index);
-    setFields(newFields);
-  };
+  const { state, addField, updateField, deleteField } = useSchema();
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -76,13 +36,12 @@ function App() {
               }}
             >
               <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                {fields.map((field, index) => (
+                {state.fields.map((field, index) => (
                   <SchemaField
                     key={field.id}
                     field={field}
                     onUpdate={(updatedField) => updateField(index, updatedField)}
                     onDelete={() => deleteField(index)}
-                    onAddChild={() => {}}
                     level={0}
                   />
                 ))}
@@ -101,12 +60,12 @@ function App() {
                   border: 'none'
                 }}
               >
-                + Add Item
+                Add Item
               </Button>
             </Card>
           </Col>
           <Col span={12}>
-            <JsonPreview fields={fields} />
+            <JsonPreview fields={state.fields} />
           </Col>
         </Row>
       </Content>
